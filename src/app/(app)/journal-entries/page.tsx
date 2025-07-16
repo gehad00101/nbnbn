@@ -1,4 +1,7 @@
 
+'use client';
+
+import { useState, useMemo } from "react";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -6,6 +9,160 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PlusCircle, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+
+interface JournalEntryRow {
+  id: number;
+  account: string;
+  debit: string;
+  credit: string;
+}
+
+function NewJournalEntryForm() {
+    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+    const [description, setDescription] = useState('');
+    const [rows, setRows] = useState<JournalEntryRow[]>([
+        { id: 1, account: '', debit: '', credit: '' },
+        { id: 2, account: '', debit: '', credit: '' },
+    ]);
+    const { toast } = useToast();
+
+    const handleAddRow = () => {
+        setRows([...rows, { id: Date.now(), account: '', debit: '', credit: '' }]);
+    };
+
+    const handleRemoveRow = (id: number) => {
+        if (rows.length <= 2) {
+            toast({ title: "لا يمكن أن يحتوي القيد على أقل من سطرين", variant: "destructive" });
+            return;
+        }
+        setRows(rows.filter(row => row.id !== id));
+    };
+
+    const handleRowChange = (id: number, field: keyof Omit<JournalEntryRow, 'id'>, value: string) => {
+        setRows(rows.map(row => {
+            if (row.id === id) {
+                 // Ensure only one of debit or credit has a value
+                if (field === 'debit' && value) {
+                    return { ...row, [field]: value, credit: '' };
+                }
+                if (field === 'credit' && value) {
+                    return { ...row, [field]: value, debit: '' };
+                }
+                return { ...row, [field]: value };
+            }
+            return row;
+        }));
+    };
+
+    const { totalDebit, totalCredit, isBalanced } = useMemo(() => {
+        const totalDebit = rows.reduce((acc, row) => acc + (parseFloat(row.debit) || 0), 0);
+        const totalCredit = rows.reduce((acc, row) => acc + (parseFloat(row.credit) || 0), 0);
+        const isBalanced = totalDebit === totalCredit && totalDebit > 0;
+        return { totalDebit, totalCredit, isBalanced };
+    }, [rows]);
+
+    const handleSave = (asDraft: boolean) => {
+        if (!description) {
+            toast({ title: "الرجاء إدخال وصف القيد", variant: "destructive" });
+            return;
+        }
+        if (!isBalanced) {
+            toast({ title: "القيد غير متزن", description: "يجب أن يتساوى إجمالي المدين مع إجمالي الدائن.", variant: "destructive" });
+            return;
+        }
+        
+        console.log("Saving Entry:", { date, description, rows, totalDebit, totalCredit });
+        toast({ title: "نجاح", description: `تم حفظ القيد ${asDraft ? 'كمسودة' : ''} بنجاح!` });
+        
+        // Reset form
+        setDate(new Date().toISOString().split('T')[0]);
+        setDescription('');
+        setRows([
+            { id: 1, account: '', debit: '', credit: '' },
+            { id: 2, account: '', debit: '', credit: '' },
+        ]);
+    };
+
+    return (
+        <Card>
+            <CardHeader>
+              <CardTitle>إنشاء قيد يومية جديد</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                 <label htmlFor="entryDate" className="block text-sm font-medium text-muted-foreground mb-1">تاريخ القيد</label>
+                 <Input id="entryDate" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+              </div>
+              <div>
+                 <label htmlFor="entryDesc" className="block text-sm font-medium text-muted-foreground mb-1">وصف القيد</label>
+                 <Input id="entryDesc" placeholder="مثال: تسجيل فاتورة مشتريات" value={description} onChange={(e) => setDescription(e.target.value)} />
+              </div>
+
+              <div className="border-t pt-4 mt-4">
+                <h4 className="text-lg font-semibold mb-2">تفاصيل القيد</h4>
+                <div className="space-y-2">
+                    {rows.map(row => (
+                        <div key={row.id} className="flex flex-col sm:flex-row gap-2 sm:items-end">
+                           <Input 
+                                className="flex-1" 
+                                placeholder="الحساب" 
+                                value={row.account}
+                                onChange={(e) => handleRowChange(row.id, 'account', e.target.value)}
+                            />
+                           <div className="flex gap-2 w-full sm:w-auto">
+                             <Input 
+                                type="number" 
+                                className="flex-1" 
+                                placeholder="مدين" 
+                                value={row.debit}
+                                onChange={(e) => handleRowChange(row.id, 'debit', e.target.value)}
+                             />
+                             <Input 
+                                type="number" 
+                                className="flex-1" 
+                                placeholder="دائن" 
+                                value={row.credit}
+                                onChange={(e) => handleRowChange(row.id, 'credit', e.target.value)}
+                            />
+                             <Button variant="ghost" size="icon" className="h-9 w-9 text-destructive shrink-0" onClick={() => handleRemoveRow(row.id)}>
+                                <Trash2 className="h-4 w-4" />
+                             </Button>
+                           </div>
+                        </div>
+                    ))}
+                </div>
+                 <Button variant="outline" size="sm" className="mt-2 w-full" onClick={handleAddRow}>
+                    <PlusCircle className="ml-2 h-4 w-4" />
+                    إضافة سطر
+                 </Button>
+              </div>
+
+              <div className="flex justify-between items-center font-bold text-lg border-t pt-4 mt-4">
+                  <span>الإجمالي</span>
+                  <div className="flex gap-4 font-mono">
+                    <span>{totalDebit.toFixed(2)}</span>
+                    <span>{totalCredit.toFixed(2)}</span>
+                  </div>
+              </div>
+               <Badge className={cn("text-center w-full", isBalanced ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600')} >
+                  {isBalanced ? 'متزن' : 'غير متزن'}
+                </Badge>
+
+            </CardContent>
+            <CardFooter className="flex gap-2 flex-col sm:flex-row">
+                 <Button className="w-full" onClick={() => handleSave(false)} disabled={!isBalanced}>
+                    <PlusCircle className="ml-2 h-4 w-4" />
+                    حفظ القيد
+                </Button>
+                 <Button className="w-full" variant="outline" onClick={() => handleSave(true)} disabled={!isBalanced}>
+                    حفظ كمسودة
+                </Button>
+            </CardFooter>
+          </Card>
+    );
+}
 
 export default function JournalEntriesPage() {
   return (
@@ -65,70 +222,7 @@ export default function JournalEntriesPage() {
           </Card>
         </div>
         <div>
-          <Card>
-            <CardHeader>
-              <CardTitle>إنشاء قيد يومية جديد</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                 <label htmlFor="entryDate" className="block text-sm font-medium text-muted-foreground mb-1">تاريخ القيد</label>
-                 <Input id="entryDate" type="date" defaultValue={new Date().toISOString().split('T')[0]} />
-              </div>
-              <div>
-                 <label htmlFor="entryDesc" className="block text-sm font-medium text-muted-foreground mb-1">وصف القيد</label>
-                 <Input id="entryDesc" placeholder="مثال: تسجيل فاتورة مشتريات" />
-              </div>
-
-              <div className="border-t pt-4 mt-4">
-                <h4 className="text-lg font-semibold mb-2">تفاصيل القيد</h4>
-                <div className="space-y-2">
-                    {/* Entry Row 1 */}
-                    <div className="flex flex-col sm:flex-row gap-2 sm:items-end">
-                       <Input className="flex-1" placeholder="الحساب" />
-                       <div className="flex gap-2">
-                         <Input type="number" className="flex-1" placeholder="مدين" />
-                         <Input type="number" className="flex-1" placeholder="دائن" />
-                         <Button variant="ghost" size="icon" className="h-9 w-9 text-destructive shrink-0"><Trash2 className="h-4 w-4" /></Button>
-                       </div>
-                    </div>
-                     {/* Entry Row 2 */}
-                    <div className="flex flex-col sm:flex-row gap-2 sm:items-end">
-                       <Input className="flex-1" placeholder="الحساب" />
-                       <div className="flex gap-2">
-                         <Input type="number" className="flex-1" placeholder="مدين" />
-                         <Input type="number" className="flex-1" placeholder="دائن" />
-                         <Button variant="ghost" size="icon" className="h-9 w-9 text-destructive shrink-0"><Trash2 className="h-4 w-4" /></Button>
-                       </div>
-                    </div>
-                </div>
-                 <Button variant="outline" size="sm" className="mt-2 w-full">
-                    <PlusCircle className="ml-2 h-4 w-4" />
-                    إضافة سطر
-                 </Button>
-              </div>
-
-              <div className="flex justify-between items-center font-bold text-lg border-t pt-4 mt-4">
-                  <span>الإجمالي</span>
-                  <div className="flex gap-4">
-                    <span>0.00</span>
-                    <span>0.00</span>
-                  </div>
-              </div>
-               <Badge variant="destructive" className="text-center w-full">
-                  غير متزن
-                </Badge>
-
-            </CardContent>
-            <CardFooter className="flex gap-2 flex-col sm:flex-row">
-                 <Button className="w-full">
-                    <PlusCircle className="ml-2 h-4 w-4" />
-                    حفظ القيد
-                </Button>
-                 <Button className="w-full" variant="outline">
-                    حفظ كمسودة
-                </Button>
-            </CardFooter>
-          </Card>
+          <NewJournalEntryForm />
         </div>
       </div>
     </div>
