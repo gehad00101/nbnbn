@@ -13,7 +13,6 @@ import { useToast } from '@/hooks/use-toast';
 import { addBankTransaction, getBankTransactions, BankTransaction } from '@/firebase/services/bankService';
 import { TableSkeleton } from '@/components/table-skeleton';
 import { Spinner } from '@/components/spinner';
-import { revalidatePath } from 'next/cache';
 import { useRouter } from 'next/navigation';
 
 async function BankTable() {
