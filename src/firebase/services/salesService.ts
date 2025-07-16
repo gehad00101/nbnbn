@@ -1,7 +1,6 @@
 
 import { db } from '@/firebase/config';
 import { collection, addDoc, getDocs, query, serverTimestamp, orderBy, DocumentReference, where } from 'firebase/firestore';
-import { getCurrentUser } from '@/utils/auth';
 
 export interface Sale {
   id: string;
@@ -20,14 +19,15 @@ export interface NewSale {
   branchId: string;
 }
 
-const getSalesCollectionRef = async () => {
-    const user = await getCurrentUser();
-    return collection(db, 'users', user.uid, 'sales');
+const FAKE_USER_ID = 'default-user';
+
+const getSalesCollectionRef = () => {
+    return collection(db, 'users', FAKE_USER_ID, 'sales');
 }
 
 // Function to add a new sale and return its reference
 export async function addSale(saleData: NewSale): Promise<DocumentReference> {
-  const salesCollectionRef = await getSalesCollectionRef();
+  const salesCollectionRef = getSalesCollectionRef();
   
   const docRef = await addDoc(salesCollectionRef, {
     ...saleData,
@@ -38,7 +38,7 @@ export async function addSale(saleData: NewSale): Promise<DocumentReference> {
 
 // Function to get all sales for a user's branch
 export async function getSales(branchId: string): Promise<Sale[]> {
-  const salesCollectionRef = await getSalesCollectionRef();
+  const salesCollectionRef = getSalesCollectionRef();
   const q = query(
     salesCollectionRef,
     where('branchId', '==', branchId),

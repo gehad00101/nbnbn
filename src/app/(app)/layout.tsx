@@ -39,20 +39,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Logo } from "@/components/logo";
 import { Header } from "@/components/header";
-import { useAuth } from "@/context/AuthContext";
-import { auth } from "@/firebase/config";
 import { useRouter } from "next/navigation";
 import { useBranch } from "@/context/BranchContext";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth();
   const router = useRouter();
   const { selectedBranch, branches, selectBranch } = useBranch();
-
-  const handleLogout = async () => {
-    await auth.signOut();
-    router.push('/login');
-  };
 
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
@@ -146,40 +138,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-3 w-full p-2 rounded-md hover:bg-sidebar-accent transition-colors">
+           <div className="flex items-center gap-3 w-full p-2">
                 <Avatar className="h-9 w-9">
-                  <AvatarImage src={user?.photoURL || `https://placehold.co/100x100.png`} alt={user?.displayName || "User"} data-ai-hint="person portrait" />
-                  <AvatarFallback>{user?.displayName ? getInitials(user.displayName) : 'U'}</AvatarFallback>
+                  <AvatarImage src={`https://placehold.co/100x100.png`} alt="User" data-ai-hint="person portrait" />
+                  <AvatarFallback>U</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 text-right">
                   <p className="text-sm font-medium text-sidebar-foreground">
-                    {user?.displayName || "مستخدم"}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {user?.email}
+                    مستخدم
                   </p>
                 </div>
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" forceMount>
-               <DropdownMenuItem>
-                <UserCircle className="mr-2 h-4 w-4" />
-                <span>الملف الشخصي</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
-                <span>الإعدادات</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout}>
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>تسجيل الخروج</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              </div>
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>

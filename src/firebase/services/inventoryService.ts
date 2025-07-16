@@ -1,7 +1,6 @@
 
 import { db } from '@/firebase/config';
 import { collection, addDoc, getDocs, query, serverTimestamp, orderBy, doc, updateDoc, deleteDoc, where } from 'firebase/firestore';
-import { getCurrentUser } from '@/utils/auth';
 
 export interface InventoryItem {
   id: string;
@@ -21,14 +20,15 @@ export interface NewInventoryItem {
   branchId: string;
 }
 
-const getInventoryCollectionRef = async () => {
-    const user = await getCurrentUser();
-    return collection(db, 'users', user.uid, 'inventory');
+const FAKE_USER_ID = 'default-user';
+
+const getInventoryCollectionRef = () => {
+    return collection(db, 'users', FAKE_USER_ID, 'inventory');
 }
 
 // Function to add a new inventory item
 export async function addInventoryItem(itemData: NewInventoryItem) {
-  const inventoryCollectionRef = await getInventoryCollectionRef();
+  const inventoryCollectionRef = getInventoryCollectionRef();
   
   await addDoc(inventoryCollectionRef, {
     ...itemData,
@@ -38,7 +38,7 @@ export async function addInventoryItem(itemData: NewInventoryItem) {
 
 // Function to get all inventory items for a user's branch
 export async function getInventoryItems(branchId: string): Promise<InventoryItem[]> {
-  const inventoryCollectionRef = await getInventoryCollectionRef();
+  const inventoryCollectionRef = getInventoryCollectionRef();
   const q = query(
     inventoryCollectionRef, 
     where('branchId', '==', branchId),
@@ -56,14 +56,12 @@ export async function getInventoryItems(branchId: string): Promise<InventoryItem
 
 // Function to update an inventory item
 export async function updateInventoryItem(itemId: string, itemData: Partial<NewInventoryItem>) {
-  const user = await getCurrentUser();
-  const itemDocRef = doc(db, 'users', user.uid, 'inventory', itemId);
+  const itemDocRef = doc(db, 'users', FAKE_USER_ID, 'inventory', itemId);
   await updateDoc(itemDocRef, itemData);
 }
 
 // Function to delete an inventory item
 export async function deleteInventoryItem(itemId: string) {
-  const user = await getCurrentUser();
-  const itemDocRef = doc(db, 'users', user.uid, 'inventory', itemId);
+  const itemDocRef = doc(db, 'users', FAKE_USER_ID, 'inventory', itemId);
   await deleteDoc(itemDocRef);
 }

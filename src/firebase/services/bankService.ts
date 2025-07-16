@@ -1,7 +1,6 @@
 
 import { db } from '@/firebase/config';
 import { collection, addDoc, getDocs, query, serverTimestamp, orderBy, where } from 'firebase/firestore';
-import { getCurrentUser } from '@/utils/auth';
 
 export interface BankTransaction {
   id: string;
@@ -21,9 +20,10 @@ export interface NewBankTransaction {
   branchId: string;
 }
 
-const getBankCollectionRef = async () => {
-    const user = await getCurrentUser();
-    return collection(db, 'users', user.uid, 'bankTransactions');
+const FAKE_USER_ID = 'default-user';
+
+const getBankCollectionRef = () => {
+    return collection(db, 'users', FAKE_USER_ID, 'bankTransactions');
 }
 
 // Function to add a new bank transaction
@@ -31,7 +31,7 @@ export async function addBankTransaction(transactionData: NewBankTransaction) {
   if (!transactionData.branchId) {
     throw new Error("Branch ID is required to add a bank transaction.");
   }
-  const bankCollectionRef = await getBankCollectionRef();
+  const bankCollectionRef = getBankCollectionRef();
   
   await addDoc(bankCollectionRef, {
     ...transactionData,
@@ -41,7 +41,7 @@ export async function addBankTransaction(transactionData: NewBankTransaction) {
 
 // Function to get all bank transactions for a user's branch
 export async function getBankTransactions(branchId: string): Promise<BankTransaction[]> {
-  const bankCollectionRef = await getBankCollectionRef();
+  const bankCollectionRef = getBankCollectionRef();
   const q = query(
     bankCollectionRef,
     where('branchId', '==', branchId), 
