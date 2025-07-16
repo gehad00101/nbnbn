@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -565,10 +566,11 @@ const SidebarMenuButton = React.forwardRef<
       </>
     )
 
+    const Comp = asChild ? Slot : 'button';
+
     const button = href ? (
-       <Link href={href} passHref legacyBehavior>
-        <a
-          ref={ref as any}
+       <Link href={href} ref={ref as any} legacyBehavior={false}>
+        <Comp
           data-sidebar="menu-button"
           data-size={size}
           data-active={isActive}
@@ -576,7 +578,7 @@ const SidebarMenuButton = React.forwardRef<
           {...props}
         >
           {buttonContent}
-        </a>
+        </Comp>
       </Link>
     ) : (
       <button
