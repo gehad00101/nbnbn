@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Logo } from "@/components/logo";
 import { Header } from "@/components/header";
+import { BranchProvider } from "@/context/BranchContext";
 
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -153,10 +154,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </DropdownMenu>
         </SidebarFooter>
       </Sidebar>
-      <SidebarInset>
-        <Header />
-        {children}
-      </SidebarInset>
+      <BranchProvider>
+        <SidebarInset>
+          <Header />
+          {children}
+        </SidebarInset>
+      </BranchProvider>
     </SidebarProvider>
   );
 }
