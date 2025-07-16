@@ -9,7 +9,6 @@ export interface Expense {
   category: string;
   amount: number;
   date: string;
-  branchId: string;
 }
 
 export interface NewExpense {
@@ -17,7 +16,6 @@ export interface NewExpense {
   category: string;
   amount: number;
   date: string;
-  branchId: string;
 }
 
 // Function to add a new expense
@@ -32,13 +30,12 @@ export async function addExpense(expenseData: NewExpense) {
   });
 }
 
-// Function to get all expenses for a specific branch
-export async function getExpensesForBranch(branchId: string): Promise<Expense[]> {
+// Function to get all expenses for a user
+export async function getExpenses(): Promise<Expense[]> {
   const user = await getCurrentUser();
   const expensesCollectionRef = collection(db, 'users', user.uid, 'expenses');
   const q = query(
     expensesCollectionRef, 
-    where('branchId', '==', branchId),
     orderBy('createdAt', 'desc')
   );
 

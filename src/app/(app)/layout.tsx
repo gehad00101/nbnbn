@@ -39,7 +39,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Logo } from "@/components/logo";
 import { Header } from "@/components/header";
-import { BranchProvider } from "@/context/BranchContext";
 
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -117,12 +116,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 البنك
               </SidebarMenuButton>
             </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton href="/branches">
-                <Building />
-                الفروع
-              </SidebarMenuButton>
-            </SidebarMenuItem>
              <SidebarMenuItem>
               <SidebarMenuButton href="/users">
                 <UserCog />
@@ -168,12 +161,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </DropdownMenu>
         </SidebarFooter>
       </Sidebar>
-      <BranchProvider>
-        <SidebarInset>
-          <Header />
-          {children}
-        </SidebarInset>
-      </BranchProvider>
+      <SidebarInset>
+        <Header />
+        {children}
+      </SidebarInset>
     </SidebarProvider>
   );
 }

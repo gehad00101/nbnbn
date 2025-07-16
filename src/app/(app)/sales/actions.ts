@@ -11,7 +11,6 @@ const saleSchema = z.object({
   amount: z.coerce.number().min(0.01, 'المبلغ يجب أن يكون أكبر من صفر'),
   date: z.string().min(1, 'التاريخ مطلوب'),
   status: z.enum(['paid', 'due']),
-  branchId: z.string().min(1, 'معرف الفرع مطلوب'),
 });
 
 export type FormState = {
@@ -26,7 +25,6 @@ export async function addSaleAction(prevState: FormState, formData: FormData): P
     amount: formData.get('amount'),
     date: formData.get('date'),
     status: formData.get('status'),
-    branchId: formData.get('branchId'),
   });
 
   if (!validatedFields.success) {

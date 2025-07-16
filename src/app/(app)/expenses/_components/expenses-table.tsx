@@ -49,7 +49,7 @@ export function ExpensesTable({ expenses }: ExpensesTableProps) {
             ) : (
               <TableRow>
                 <TableCell colSpan={4} className="text-center">
-                  لا توجد مصروفات لهذا الفرع بعد.
+                  لا توجد مصروفات بعد.
                 </TableCell>
               </TableRow>
             )}

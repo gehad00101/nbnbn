@@ -43,7 +43,7 @@ export function SalesTable({ sales }: SalesTableProps) {
             ) : (
               <TableRow>
                 <TableCell colSpan={5} className="text-center">
-                  لا توجد فواتير لهذا الفرع بعد.
+                  لا توجد فواتير بعد.
                 </TableCell>
               </TableRow>
             )}

@@ -21,12 +21,11 @@ const expenseSchema = z.object({
   amount: z.coerce.number().min(0.01, 'المبلغ يجب أن يكون أكبر من صفر'),
   date: z.string().min(1, 'التاريخ مطلوب'),
   category: z.string().min(1, 'الفئة مطلوبة'),
-  branchId: z.string(),
 });
 
 type ExpenseFormValues = z.infer<typeof expenseSchema>;
 
-export function ExpensesForm({ branchId }: { branchId: string }) {
+export function ExpensesForm() {
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -40,7 +39,6 @@ export function ExpensesForm({ branchId }: { branchId: string }) {
       amount: 0,
       date: new Date().toISOString().split('T')[0],
       category: '',
-      branchId: branchId,
     },
   });
 
@@ -66,7 +64,6 @@ export function ExpensesForm({ branchId }: { branchId: string }) {
           className="space-y-4"
         >
           <CardContent className="space-y-4">
-            <input type="hidden" name="branchId" value={branchId} />
              <FormField
               control={form.control}
               name="description"

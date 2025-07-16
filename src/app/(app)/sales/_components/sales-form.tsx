@@ -7,7 +7,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -21,12 +20,11 @@ const saleSchema = z.object({
   amount: z.coerce.number().min(0.01, 'المبلغ يجب أن يكون أكبر من صفر'),
   date: z.string().min(1, 'التاريخ مطلوب'),
   status: z.enum(['paid', 'due']),
-  branchId: z.string(),
 });
 
 type SaleFormValues = z.infer<typeof saleSchema>;
 
-export function SalesForm({ branchId }: { branchId: string }) {
+export function SalesForm() {
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -40,7 +38,6 @@ export function SalesForm({ branchId }: { branchId: string }) {
       amount: 0,
       date: new Date().toISOString().split('T')[0],
       status: 'paid',
-      branchId: branchId,
     },
   });
 
@@ -66,7 +63,6 @@ export function SalesForm({ branchId }: { branchId: string }) {
           className="space-y-4"
         >
           <CardContent className='space-y-4'>
-            <input type="hidden" name="branchId" value={branchId} />
             <FormField
               control={form.control}
               name="customerName"
