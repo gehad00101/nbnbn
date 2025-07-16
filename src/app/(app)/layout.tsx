@@ -37,28 +37,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Logo } from "@/components/logo";
 import { Header } from "@/components/header";
-import { useAuth } from "@/context/AuthContext";
-import { auth } from "@/firebase/config";
-import { signOut } from "firebase/auth";
-import { useRouter } from "next/navigation";
-import { useToast } from "@/hooks/use-toast";
 
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth();
-  const router = useRouter();
-  const { toast } = useToast();
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      toast({ title: "تم تسجيل الخروج بنجاح." });
-      router.push('/login');
-    } catch (error) {
-      toast({ title: "حدث خطأ أثناء تسجيل الخروج.", variant: "destructive" });
-    }
-  };
-  
   return (
     <SidebarProvider>
       <Sidebar side="right">
@@ -139,15 +121,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-3 w-full p-2 rounded-md hover:bg-sidebar-accent transition-colors">
                 <Avatar className="h-9 w-9">
-                  <AvatarImage src={user?.photoURL || "https://placehold.co/100x100.png"} alt={user?.displayName || "User"} data-ai-hint="person portrait" />
-                  <AvatarFallback>{user?.displayName?.charAt(0) || 'U'}</AvatarFallback>
+                  <AvatarImage src={"https://placehold.co/100x100.png"} alt={"User"} data-ai-hint="person portrait" />
+                  <AvatarFallback>{'U'}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 text-right">
                   <p className="text-sm font-medium text-sidebar-foreground">
-                    {user?.displayName || "مستخدم"}
+                    {"مستخدم"}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {user?.email}
+                    user@example.com
                   </p>
                 </div>
                 <ChevronDown className="h-4 w-4 text-muted-foreground" />
@@ -163,7 +145,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <span>الإعدادات</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout}>
+              <DropdownMenuItem>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>تسجيل الخروج</span>
               </DropdownMenuItem>
