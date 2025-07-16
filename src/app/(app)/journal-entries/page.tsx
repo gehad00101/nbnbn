@@ -19,46 +19,48 @@ export default function JournalEntriesPage() {
               <CardTitle>دفتر اليومية</CardTitle>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-right">رقم القيد</TableHead>
-                    <TableHead className="text-right">التاريخ</TableHead>
-                    <TableHead className="text-right">الوصف</TableHead>
-                    <TableHead className="text-center">الحالة</TableHead>
-                    <TableHead className="text-right">الإجمالي</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow>
-                    <TableCell className="font-mono">JE-001</TableCell>
-                    <TableCell>2024-07-20</TableCell>
-                    <TableCell>إثبات مصروف الكهرباء للشهر</TableCell>
-                    <TableCell className="text-center">
-                      <Badge variant="secondary">مرحل</Badge>
-                    </TableCell>
-                    <TableCell>350.00 ريال</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-mono">JE-002</TableCell>
-                    <TableCell>2024-07-19</TableCell>
-                    <TableCell>تسجيل مبيعات نقدية</TableCell>
-                    <TableCell className="text-center">
-                       <Badge variant="secondary">مرحل</Badge>
-                    </TableCell>
-                    <TableCell>1,250.50 ريال</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-mono">JE-003</TableCell>
-                    <TableCell>2024-07-18</TableCell>
-                    <TableCell>شراء بضاعة على الحساب</TableCell>
-                     <TableCell className="text-center">
-                      <Badge>مسودة</Badge>
-                    </TableCell>
-                    <TableCell>5,000.00 ريال</TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-right">رقم القيد</TableHead>
+                      <TableHead className="text-right">التاريخ</TableHead>
+                      <TableHead className="text-right">الوصف</TableHead>
+                      <TableHead className="text-center">الحالة</TableHead>
+                      <TableHead className="text-right">الإجمالي</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell className="font-mono">JE-001</TableCell>
+                      <TableCell>2024-07-20</TableCell>
+                      <TableCell>إثبات مصروف الكهرباء للشهر</TableCell>
+                      <TableCell className="text-center">
+                        <Badge variant="secondary">مرحل</Badge>
+                      </TableCell>
+                      <TableCell>350.00 ريال</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-mono">JE-002</TableCell>
+                      <TableCell>2024-07-19</TableCell>
+                      <TableCell>تسجيل مبيعات نقدية</TableCell>
+                      <TableCell className="text-center">
+                         <Badge variant="secondary">مرحل</Badge>
+                      </TableCell>
+                      <TableCell>1,250.50 ريال</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-mono">JE-003</TableCell>
+                      <TableCell>2024-07-18</TableCell>
+                      <TableCell>شراء بضاعة على الحساب</TableCell>
+                       <TableCell className="text-center">
+                        <Badge>مسودة</Badge>
+                      </TableCell>
+                      <TableCell>5,000.00 ريال</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -81,18 +83,22 @@ export default function JournalEntriesPage() {
                 <h4 className="text-lg font-semibold mb-2">تفاصيل القيد</h4>
                 <div className="space-y-2">
                     {/* Entry Row 1 */}
-                    <div className="flex gap-2 items-end">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:items-end">
                        <Input className="flex-1" placeholder="الحساب" />
-                       <Input type="number" className="w-28" placeholder="مدين" />
-                       <Input type="number" className="w-28" placeholder="دائن" />
-                       <Button variant="ghost" size="icon" className="h-9 w-9 text-destructive"><Trash2 className="h-4 w-4" /></Button>
+                       <div className="flex gap-2">
+                         <Input type="number" className="flex-1" placeholder="مدين" />
+                         <Input type="number" className="flex-1" placeholder="دائن" />
+                         <Button variant="ghost" size="icon" className="h-9 w-9 text-destructive shrink-0"><Trash2 className="h-4 w-4" /></Button>
+                       </div>
                     </div>
                      {/* Entry Row 2 */}
-                    <div className="flex gap-2 items-end">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:items-end">
                        <Input className="flex-1" placeholder="الحساب" />
-                       <Input type="number" className="w-28" placeholder="مدين" />
-                       <Input type="number" className="w-28" placeholder="دائن" />
-                       <Button variant="ghost" size="icon" className="h-9 w-9 text-destructive"><Trash2 className="h-4 w-4" /></Button>
+                       <div className="flex gap-2">
+                         <Input type="number" className="flex-1" placeholder="مدين" />
+                         <Input type="number" className="flex-1" placeholder="دائن" />
+                         <Button variant="ghost" size="icon" className="h-9 w-9 text-destructive shrink-0"><Trash2 className="h-4 w-4" /></Button>
+                       </div>
                     </div>
                 </div>
                  <Button variant="outline" size="sm" className="mt-2 w-full">
@@ -113,7 +119,7 @@ export default function JournalEntriesPage() {
                 </Badge>
 
             </CardContent>
-            <CardFooter className="flex gap-2">
+            <CardFooter className="flex gap-2 flex-col sm:flex-row">
                  <Button className="w-full">
                     <PlusCircle className="ml-2 h-4 w-4" />
                     حفظ القيد

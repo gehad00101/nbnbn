@@ -89,34 +89,36 @@ function BankPageContent() {
               {loading ? (
                 <TableSkeleton headers={['التاريخ', 'الوصف', 'نوع المعاملة', 'المبلغ']} />
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-right">التاريخ</TableHead>
-                      <TableHead className="text-right">الوصف</TableHead>
-                      <TableHead className="text-right">نوع المعاملة</TableHead>
-                      <TableHead className="text-right">المبلغ</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {transactions.length > 0 ? (
-                      transactions.map(t => (
-                        <TableRow key={t.id}>
-                          <TableCell>{t.date}</TableCell>
-                          <TableCell>{t.description}</TableCell>
-                          <TableCell className={t.type === 'deposit' ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
-                            {t.type === 'deposit' ? 'إيداع' : 'سحب'}
-                          </TableCell>
-                          <TableCell>{t.type === 'deposit' ? '+' : '-'}{t.amount.toFixed(2)} ريال</TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
                       <TableRow>
-                        <TableCell colSpan={4} className="text-center">لا توجد معاملات بعد.</TableCell>
+                        <TableHead className="text-right">التاريخ</TableHead>
+                        <TableHead className="text-right">الوصف</TableHead>
+                        <TableHead className="text-right">نوع المعاملة</TableHead>
+                        <TableHead className="text-right">المبلغ</TableHead>
                       </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {transactions.length > 0 ? (
+                        transactions.map(t => (
+                          <TableRow key={t.id}>
+                            <TableCell>{t.date}</TableCell>
+                            <TableCell>{t.description}</TableCell>
+                            <TableCell className={t.type === 'deposit' ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
+                              {t.type === 'deposit' ? 'إيداع' : 'سحب'}
+                            </TableCell>
+                            <TableCell>{t.type === 'deposit' ? '+' : '-'}{t.amount.toFixed(2)} ريال</TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={4} className="text-center">لا توجد معاملات بعد.</TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -149,7 +151,7 @@ function BankPageContent() {
                 <Label htmlFor="transactionDesc">الوصف</Label>
                 <Input id="transactionDesc" placeholder="مثال: إيداع نقدي" value={description} onChange={e => setDescription(e.target.value)} disabled={isSubmitting} />
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-col sm:flex-row">
                 <Button className="w-full" variant="outline" onClick={() => handleTransaction('deposit')} disabled={isSubmitting}>
                     {isSubmitting ? <Spinner/> : <ArrowUpCircle className="ml-2 h-4 w-4 text-green-500" />}
                     إيداع

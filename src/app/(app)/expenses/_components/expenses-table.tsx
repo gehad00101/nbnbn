@@ -27,34 +27,36 @@ export function ExpensesTable({ expenses }: ExpensesTableProps) {
         <CardTitle>سجل المصروفات</CardTitle>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="text-right">الوصف</TableHead>
-              <TableHead className="text-right">الفئة</TableHead>
-              <TableHead className="text-right">التاريخ</TableHead>
-              <TableHead className="text-right">المبلغ</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {expenses.length > 0 ? (
-              expenses.map((expense) => (
-                <TableRow key={expense.id}>
-                  <TableCell>{expense.description}</TableCell>
-                  <TableCell>{getCategoryDisplayName(expense.category)}</TableCell>
-                  <TableCell>{expense.date}</TableCell>
-                  <TableCell>{expense.amount.toFixed(2)} ريال</TableCell>
-                </TableRow>
-              ))
-            ) : (
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={4} className="text-center">
-                  لا توجد مصروفات بعد.
-                </TableCell>
+                <TableHead className="text-right">الوصف</TableHead>
+                <TableHead className="text-right">الفئة</TableHead>
+                <TableHead className="text-right">التاريخ</TableHead>
+                <TableHead className="text-right">المبلغ</TableHead>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {expenses.length > 0 ? (
+                expenses.map((expense) => (
+                  <TableRow key={expense.id}>
+                    <TableCell>{expense.description}</TableCell>
+                    <TableCell>{getCategoryDisplayName(expense.category)}</TableCell>
+                    <TableCell>{expense.date}</TableCell>
+                    <TableCell>{expense.amount.toFixed(2)} ريال</TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center">
+                    لا توجد مصروفات بعد.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );
