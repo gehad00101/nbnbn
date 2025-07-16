@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from '@/lib/utils';
 
-const professionalChartOfAccounts = [
+export const professionalChartOfAccounts = [
   { id: '1', name: 'الأصول', type: 'header', parentId: null, children: [
     { id: '10', name: 'الأصول المتداولة', type: 'header', parentId: '1', children: [
       { id: '101', name: '101 - النقدية وما في حكمها', type: 'header', parentId: '10', children: [
@@ -134,7 +134,7 @@ const AccountRow = ({ account, level = 0 }: { account: any, level?: number }) =>
       <div className={cn(
         "flex items-center justify-between p-2 rounded-md hover:bg-muted/50",
         account.type === 'header' ? 'bg-secondary' : ''
-      )} style={{ marginRight: `${level * 2}rem` }}>
+      )} style={{ paddingRight: `${level * 2}rem` }}>
         <div className="flex items-center gap-2">
           {hasChildren && (
             <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setIsOpen(!isOpen)}>

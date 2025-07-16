@@ -11,6 +11,9 @@ import { PlusCircle, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { professionalChartOfAccounts } from '../chart-of-accounts/page';
+
 
 interface JournalEntryRow {
   id: number;
@@ -18,6 +21,17 @@ interface JournalEntryRow {
   debit: string;
   credit: string;
 }
+
+const flattenAccounts = (accounts: any[], level = 0) => {
+    let flatList: any[] = [];
+    accounts.forEach(account => {
+        flatList.push({ ...account, level });
+        if (account.children && account.children.length > 0) {
+            flatList = flatList.concat(flattenAccounts(account.children, level + 1));
+        }
+    });
+    return flatList;
+};
 
 function NewJournalEntryForm() {
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -27,6 +41,8 @@ function NewJournalEntryForm() {
         { id: 2, account: '', debit: '', credit: '' },
     ]);
     const { toast } = useToast();
+
+    const flatAccounts = useMemo(() => flattenAccounts(professionalChartOfAccounts), []);
 
     const handleAddRow = () => {
         setRows([...rows, { id: Date.now(), account: '', debit: '', credit: '' }]);
@@ -43,8 +59,7 @@ function NewJournalEntryForm() {
     const handleRowChange = (id: number, field: keyof Omit<JournalEntryRow, 'id'>, value: string) => {
         setRows(rows.map(row => {
             if (row.id === id) {
-                 // Ensure only one of debit or credit has a value
-                if (field === 'debit' && value) {
+                 if (field === 'debit' && value) {
                     return { ...row, [field]: value, credit: '' };
                 }
                 if (field === 'credit' && value) {
@@ -76,7 +91,6 @@ function NewJournalEntryForm() {
         console.log("Saving Entry:", { date, description, rows, totalDebit, totalCredit });
         toast({ title: "نجاح", description: `تم حفظ القيد ${asDraft ? 'كمسودة' : ''} بنجاح!` });
         
-        // Reset form
         setDate(new Date().toISOString().split('T')[0]);
         setDescription('');
         setRows([
@@ -105,12 +119,29 @@ function NewJournalEntryForm() {
                 <div className="space-y-2">
                     {rows.map(row => (
                         <div key={row.id} className="flex flex-col sm:flex-row gap-2 sm:items-end">
-                           <Input 
-                                className="flex-1" 
-                                placeholder="الحساب" 
-                                value={row.account}
-                                onChange={(e) => handleRowChange(row.id, 'account', e.target.value)}
-                            />
+                           <div className="flex-1">
+                                <Select 
+                                    dir="rtl"
+                                    value={row.account}
+                                    onValueChange={(value) => handleRowChange(row.id, 'account', value)}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="اختر الحساب" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {flatAccounts.map(account => (
+                                            <SelectItem 
+                                                key={account.id} 
+                                                value={account.id}
+                                                disabled={account.type === 'header'}
+                                                style={{ paddingRight: `${account.level * 1.5}rem` }}
+                                            >
+                                                <span className={cn(account.type === 'header' ? 'font-bold' : '')}>{account.name}</span>
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                           </div>
                            <div className="flex gap-2 w-full sm:w-auto">
                              <Input 
                                 type="number" 
