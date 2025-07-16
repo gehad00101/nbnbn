@@ -21,6 +21,7 @@ import {
   ChevronDown,
   Settings,
   LogOut,
+  UserCog,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -94,6 +95,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <SidebarMenuButton href="/branches">
                 <Building />
                 الفروع
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+             <SidebarMenuItem>
+              <SidebarMenuButton href="/users">
+                <UserCog />
+                إدارة المستخدمين
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
