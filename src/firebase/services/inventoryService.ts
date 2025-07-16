@@ -1,6 +1,6 @@
 
 import { db } from '@/firebase/config';
-import { collection, addDoc, getDocs, query, serverTimestamp, orderBy } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, serverTimestamp, orderBy, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 
 export interface InventoryItem {
   id: string;
@@ -49,4 +49,20 @@ export async function getInventoryItems(): Promise<InventoryItem[]> {
   });
 
   return items;
+}
+
+// Function to update an inventory item
+export async function updateInventoryItem(itemId: string, itemData: Partial<NewInventoryItem>) {
+  // We are using a hard-coded user ID because auth has been removed.
+  const userId = 'default-user';
+  const itemDocRef = doc(db, 'users', userId, 'inventory', itemId);
+  await updateDoc(itemDocRef, itemData);
+}
+
+// Function to delete an inventory item
+export async function deleteInventoryItem(itemId: string) {
+  // We are using a hard-coded user ID because auth has been removed.
+  const userId = 'default-user';
+  const itemDocRef = doc(db, 'users', userId, 'inventory', itemId);
+  await deleteDoc(itemDocRef);
 }
