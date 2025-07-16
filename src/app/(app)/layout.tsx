@@ -16,6 +16,7 @@ import {
   BarChart4,
   Coffee,
   ChevronDown,
+  Mic,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -62,6 +63,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <SidebarMenuButton href="/reports">
                 <BarChart4 />
                 التقارير
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+             <SidebarMenuItem>
+              <SidebarMenuButton href="/voice-assistant">
+                <Mic />
+                المساعد الصوتي
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
