@@ -19,10 +19,10 @@ export interface NewExpense {
   branchId: string;
 }
 
-const FAKE_USER_ID = 'default-user';
-
 const getExpensesCollectionRef = () => {
-    return collection(db, 'users', FAKE_USER_ID, 'expenses');
+    const user = auth.currentUser;
+    if (!user) throw new Error("User not authenticated");
+    return collection(db, 'users', user.uid, 'expenses');
 }
 
 // Function to add a new expense

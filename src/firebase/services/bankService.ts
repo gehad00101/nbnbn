@@ -1,5 +1,5 @@
 
-import { db } from '@/firebase/config';
+import { db, auth } from '@/firebase/config';
 import { collection, addDoc, getDocs, query, serverTimestamp, orderBy, where } from 'firebase/firestore';
 
 export interface BankTransaction {
@@ -20,10 +20,10 @@ export interface NewBankTransaction {
   branchId: string;
 }
 
-const FAKE_USER_ID = 'default-user';
-
 const getBankCollectionRef = () => {
-    return collection(db, 'users', FAKE_USER_ID, 'bankTransactions');
+    const user = auth.currentUser;
+    if (!user) throw new Error("User not authenticated");
+    return collection(db, 'users', user.uid, 'bankTransactions');
 }
 
 // Function to add a new bank transaction

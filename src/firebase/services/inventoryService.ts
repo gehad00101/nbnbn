@@ -1,5 +1,5 @@
 
-import { db } from '@/firebase/config';
+import { db, auth } from '@/firebase/config';
 import { collection, addDoc, getDocs, query, serverTimestamp, orderBy, doc, updateDoc, deleteDoc, where } from 'firebase/firestore';
 
 export interface InventoryItem {
@@ -20,10 +20,10 @@ export interface NewInventoryItem {
   branchId: string;
 }
 
-const FAKE_USER_ID = 'default-user';
-
 const getInventoryCollectionRef = () => {
-    return collection(db, 'users', FAKE_USER_ID, 'inventory');
+    const user = auth.currentUser;
+    if (!user) throw new Error("User not authenticated");
+    return collection(db, 'users', user.uid, 'inventory');
 }
 
 // Function to add a new inventory item
@@ -56,12 +56,12 @@ export async function getInventoryItems(branchId: string): Promise<InventoryItem
 
 // Function to update an inventory item
 export async function updateInventoryItem(itemId: string, itemData: Partial<NewInventoryItem>) {
-  const itemDocRef = doc(db, 'users', FAKE_USER_ID, 'inventory', itemId);
+  const itemDocRef = doc(db, 'users', auth.currentUser!.uid, 'inventory', itemId);
   await updateDoc(itemDocRef, itemData);
 }
 
 // Function to delete an inventory item
 export async function deleteInventoryItem(itemId: string) {
-  const itemDocRef = doc(db, 'users', FAKE_USER_ID, 'inventory', itemId);
+  const itemDocRef = doc(db, 'users', auth.currentUser!.uid, 'inventory', itemId);
   await deleteDoc(itemDocRef);
 }

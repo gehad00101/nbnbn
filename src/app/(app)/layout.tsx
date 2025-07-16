@@ -21,7 +21,6 @@ import {
   Building,
   Landmark,
   UserCircle,
-  ChevronDown,
   Settings,
   LogOut,
   UserCog,
@@ -40,14 +39,24 @@ import {
 import { Logo } from "@/components/logo";
 import { Header } from "@/components/header";
 import { useRouter } from "next/navigation";
-import { useBranch } from "@/context/BranchContext";
+import { useAuth } from "@/context/AuthContext";
+import { BranchGuard } from "@/components/branch-guard";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { selectedBranch, branches, selectBranch } = useBranch();
+  const { user, logout, loading } = useAuth();
 
   const getInitials = (name: string) => {
+    if (!name) return 'U';
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  }
+
+  if (loading) {
+    return (
+        <div className="flex h-screen w-screen items-center justify-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-primary"></div>
+        </div>
+    );
   }
 
   return (
@@ -138,22 +147,44 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
-           <div className="flex items-center gap-3 w-full p-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div className="flex items-center gap-3 w-full p-2 cursor-pointer hover:bg-sidebar-accent rounded-md">
                 <Avatar className="h-9 w-9">
-                  <AvatarImage src={`https://placehold.co/100x100.png`} alt="User" data-ai-hint="person portrait" />
-                  <AvatarFallback>U</AvatarFallback>
+                  <AvatarImage src={user?.photoURL ?? `https://placehold.co/100x100.png`} alt={user?.displayName ?? "User"} data-ai-hint="person portrait" />
+                  <AvatarFallback>{getInitials(user?.displayName ?? "User")}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 text-right">
                   <p className="text-sm font-medium text-sidebar-foreground">
-                    مستخدم
+                    {user?.displayName ?? "مستخدم"}
                   </p>
+                  <p className="text-xs text-sidebar-foreground/70">{user?.email}</p>
                 </div>
               </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuItem onClick={() => router.push('/profile')}>
+                    <UserCircle className="mr-2 h-4 w-4" />
+                    <span>الملف الشخصي</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push('/settings')}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>الإعدادات</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={logout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>تسجيل الخروج</span>
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+           </DropdownMenu>
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
         <Header />
-        {children}
+         <BranchGuard>
+          {(branchId) => children}
+        </BranchGuard>
       </SidebarInset>
     </SidebarProvider>
   );

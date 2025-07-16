@@ -1,5 +1,5 @@
 
-import { db } from '@/firebase/config';
+import { db, auth } from '@/firebase/config';
 import { collection, addDoc, getDocs, query, serverTimestamp, orderBy, DocumentReference, where } from 'firebase/firestore';
 
 export interface Sale {
@@ -19,10 +19,10 @@ export interface NewSale {
   branchId: string;
 }
 
-const FAKE_USER_ID = 'default-user';
-
 const getSalesCollectionRef = () => {
-    return collection(db, 'users', FAKE_USER_ID, 'sales');
+    const user = auth.currentUser;
+    if (!user) throw new Error("User not authenticated");
+    return collection(db, 'users', user.uid, 'sales');
 }
 
 // Function to add a new sale and return its reference

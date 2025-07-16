@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Noto_Kufi_Arabic } from "next/font/google";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
+import { AuthProvider } from "@/context/AuthContext";
 import { BranchProvider } from "@/context/BranchContext";
 
 const notoKufiArabic = Noto_Kufi_Arabic({
@@ -24,9 +25,11 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl">
       <body className={`${notoKufiArabic.variable} font-body antialiased bg-background`}>
-        <BranchProvider>
-          {children}
-        </BranchProvider>
+        <AuthProvider>
+          <BranchProvider>
+            {children}
+          </BranchProvider>
+        </AuthProvider>
         <Toaster />
       </body>
     </html>
