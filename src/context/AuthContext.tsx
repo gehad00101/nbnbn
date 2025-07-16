@@ -42,38 +42,36 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (loading) return;
 
     const isAuthPage = pathname === '/login' || pathname === '/register';
-    const isLandingPage = pathname === '/';
-
-    if (!user && !isAuthPage && !isLandingPage) {
+    
+    if (!user && !isAuthPage) {
       router.push('/login');
-    } else if (user && (isAuthPage || isLandingPage)) {
+    } else if (user && isAuthPage) {
       router.push('/dashboard');
     }
   }, [user, loading, pathname, router]);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <Spinner />
+      <div className="flex items-center justify-center h-screen bg-background">
+        <Spinner className="h-8 w-8" />
       </div>
     );
   }
 
   const isAuthPage = pathname === '/login' || pathname === '/register';
-  const isLandingPage = pathname === '/';
 
-  if (!user && !isAuthPage && !isLandingPage) {
+  if (!user && !isAuthPage) {
     return (
-       <div className="flex items-center justify-center h-screen">
-        <Spinner />
+       <div className="flex items-center justify-center h-screen bg-background">
+        <Spinner className="h-8 w-8" />
       </div>
     );
   }
 
-  if (user && (isAuthPage || isLandingPage)) {
+  if (user && isAuthPage) {
      return (
-       <div className="flex items-center justify-center h-screen">
-        <Spinner />
+       <div className="flex items-center justify-center h-screen bg-background">
+        <Spinner className="h-8 w-8" />
       </div>
     );
   }

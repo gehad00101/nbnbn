@@ -1,6 +1,7 @@
 
 import { db } from '@/firebase/config';
-import { collection, addDoc, getDocs, query, serverTimestamp, orderBy, DocumentReference } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, serverTimestamp, orderBy, DocumentReference, where } from 'firebase/firestore';
+import { getCurrentUser } from '@/utils/auth';
 
 export interface Sale {
   id: string;
@@ -8,6 +9,7 @@ export interface Sale {
   amount: number;
   date: string;
   status: 'paid' | 'due';
+  branchId: string;
 }
 
 export interface NewSale {
@@ -15,18 +17,17 @@ export interface NewSale {
   amount: number;
   date: string;
   status: 'paid' | 'due';
+  branchId: string;
 }
 
-const getSalesCollectionRef = () => {
-    // We are using a hard-coded user ID because auth has been removed.
-    const userId = 'default-user';
-    return collection(db, 'users', userId, 'sales');
+const getSalesCollectionRef = async () => {
+    const user = await getCurrentUser();
+    return collection(db, 'users', user.uid, 'sales');
 }
-
 
 // Function to add a new sale and return its reference
 export async function addSale(saleData: NewSale): Promise<DocumentReference> {
-  const salesCollectionRef = getSalesCollectionRef();
+  const salesCollectionRef = await getSalesCollectionRef();
   
   const docRef = await addDoc(salesCollectionRef, {
     ...saleData,
@@ -35,11 +36,12 @@ export async function addSale(saleData: NewSale): Promise<DocumentReference> {
   return docRef;
 }
 
-// Function to get all sales for a user
-export async function getSales(): Promise<Sale[]> {
-  const salesCollectionRef = getSalesCollectionRef();
+// Function to get all sales for a user's branch
+export async function getSales(branchId: string): Promise<Sale[]> {
+  const salesCollectionRef = await getSalesCollectionRef();
   const q = query(
-    salesCollectionRef, 
+    salesCollectionRef,
+    where('branchId', '==', branchId),
     orderBy('createdAt', 'desc')
   );
 

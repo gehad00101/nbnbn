@@ -1,6 +1,7 @@
 
 import { db } from '@/firebase/config';
-import { collection, addDoc, getDocs, query, serverTimestamp, orderBy, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, serverTimestamp, orderBy, doc, updateDoc, deleteDoc, where } from 'firebase/firestore';
+import { getCurrentUser } from '@/utils/auth';
 
 export interface InventoryItem {
   id: string;
@@ -9,6 +10,7 @@ export interface InventoryItem {
   unitCost: number;
   unitPrice: number | null;
   createdAt: any;
+  branchId: string;
 }
 
 export interface NewInventoryItem {
@@ -16,17 +18,17 @@ export interface NewInventoryItem {
   quantity: number;
   unitCost: number;
   unitPrice: number | null;
+  branchId: string;
 }
 
-const getInventoryCollectionRef = () => {
-    // We are using a hard-coded user ID because auth has been removed.
-    const userId = 'default-user';
-    return collection(db, 'users', userId, 'inventory');
+const getInventoryCollectionRef = async () => {
+    const user = await getCurrentUser();
+    return collection(db, 'users', user.uid, 'inventory');
 }
 
 // Function to add a new inventory item
 export async function addInventoryItem(itemData: NewInventoryItem) {
-  const inventoryCollectionRef = getInventoryCollectionRef();
+  const inventoryCollectionRef = await getInventoryCollectionRef();
   
   await addDoc(inventoryCollectionRef, {
     ...itemData,
@@ -34,11 +36,12 @@ export async function addInventoryItem(itemData: NewInventoryItem) {
   });
 }
 
-// Function to get all inventory items for a user
-export async function getInventoryItems(): Promise<InventoryItem[]> {
-  const inventoryCollectionRef = getInventoryCollectionRef();
+// Function to get all inventory items for a user's branch
+export async function getInventoryItems(branchId: string): Promise<InventoryItem[]> {
+  const inventoryCollectionRef = await getInventoryCollectionRef();
   const q = query(
     inventoryCollectionRef, 
+    where('branchId', '==', branchId),
     orderBy('createdAt', 'desc')
   );
 
@@ -53,16 +56,14 @@ export async function getInventoryItems(): Promise<InventoryItem[]> {
 
 // Function to update an inventory item
 export async function updateInventoryItem(itemId: string, itemData: Partial<NewInventoryItem>) {
-  // We are using a hard-coded user ID because auth has been removed.
-  const userId = 'default-user';
-  const itemDocRef = doc(db, 'users', userId, 'inventory', itemId);
+  const user = await getCurrentUser();
+  const itemDocRef = doc(db, 'users', user.uid, 'inventory', itemId);
   await updateDoc(itemDocRef, itemData);
 }
 
 // Function to delete an inventory item
 export async function deleteInventoryItem(itemId: string) {
-  // We are using a hard-coded user ID because auth has been removed.
-  const userId = 'default-user';
-  const itemDocRef = doc(db, 'users', userId, 'inventory', itemId);
+  const user = await getCurrentUser();
+  const itemDocRef = doc(db, 'users', user.uid, 'inventory', itemId);
   await deleteDoc(itemDocRef);
 }

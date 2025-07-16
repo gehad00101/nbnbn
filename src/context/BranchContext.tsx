@@ -43,47 +43,52 @@ export const BranchProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      setLoading(!currentUser);
+      if (!currentUser) {
+        setBranches([]);
+        setSelectedBranch(null);
+        setLoading(false);
+      }
     });
     return () => unsubscribe();
   }, []);
 
   useEffect(() => {
-    if (!user) {
-      setBranches([]);
-      setSelectedBranch(null);
-      setLoading(true);
-      return;
-    };
+    if (!user) return;
 
+    setLoading(true);
     const branchesCollectionRef = collection(db, 'users', user.uid, 'branches');
     const q = query(branchesCollectionRef, orderBy('createdAt', 'desc'));
 
     const unsubscribe = onSnapshot(q, async (snapshot) => {
-      if (snapshot.empty) {
-        // Create a default branch if none exist
-        const defaultBranch = { name: 'الفرع الرئيسي', createdAt: serverTimestamp() };
-        await setDoc(doc(branchesCollectionRef), defaultBranch);
-        // The listener will rerun and handle the new branch.
+      if (snapshot.empty && user) {
+        // Create a default branch if none exist for a logged-in user
+        try {
+          const defaultBranch = { name: 'الفرع الرئيسي', createdAt: serverTimestamp() };
+          const newBranchRef = await addDoc(branchesCollectionRef, defaultBranch);
+          const newBranch = { id: newBranchRef.id, ...defaultBranch };
+          setBranches([newBranch]);
+          setSelectedBranch(newBranch);
+          localStorage.setItem(`selectedBranchId_${user.uid}`, newBranch.id);
+        } catch(error) {
+           console.error("Error creating default branch: ", error);
+        } finally {
+           setLoading(false);
+        }
         return;
       }
 
       const branchesData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Branch));
       setBranches(branchesData);
 
-      const lastSelectedBranchId = localStorage.getItem('selectedBranchId');
+      const lastSelectedBranchId = localStorage.getItem(`selectedBranchId_${user.uid}`);
       const foundBranch = branchesData.find(b => b.id === lastSelectedBranchId);
       
       const branchToSelect = foundBranch || branchesData[0];
       
-      if (branchToSelect && branchToSelect.id !== selectedBranch?.id) {
+      if (branchToSelect) {
         setSelectedBranch(branchToSelect);
-        localStorage.setItem('selectedBranchId', branchToSelect.id);
-      } else if (!selectedBranch && branchToSelect) {
-        setSelectedBranch(branchToSelect);
-        localStorage.setItem('selectedBranchId', branchToSelect.id);
+        localStorage.setItem(`selectedBranchId_${user.uid}`, branchToSelect.id);
       }
-
       setLoading(false);
     }, (error) => {
       console.error("Error fetching branches: ", error);
@@ -92,7 +97,7 @@ export const BranchProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, [user, toast, selectedBranch?.id]);
+  }, [user, toast]);
 
   const addBranch = async (name: string) => {
     if(!user) throw new Error("User not authenticated");
@@ -108,26 +113,23 @@ export const BranchProvider = ({ children }: { children: ReactNode }) => {
     const branchDocRef = doc(db, 'users', user.uid, 'branches', id);
     await deleteDoc(branchDocRef);
     if(selectedBranch?.id === id) {
-        localStorage.removeItem('selectedBranchId');
-        if(branches.length > 1) {
-            const newSelectedBranch = branches.find(b => b.id !== id);
-            if(newSelectedBranch) {
-                 setSelectedBranch(newSelectedBranch);
-                 localStorage.setItem('selectedBranchId', newSelectedBranch.id);
-            }
-        } else {
-            setSelectedBranch(null);
+        localStorage.removeItem(`selectedBranchId_${user.uid}`);
+        const newSelected = branches.find(b => b.id !== id) || null;
+        setSelectedBranch(newSelected);
+        if (newSelected) {
+            localStorage.setItem(`selectedBranchId_${user.uid}`, newSelected.id);
         }
     }
   };
 
   const selectBranch = useCallback((id: string) => {
+    if (!user) return;
     const branch = branches.find(b => b.id === id);
     if (branch) {
       setSelectedBranch(branch);
-      localStorage.setItem('selectedBranchId', id);
+      localStorage.setItem(`selectedBranchId_${user.uid}`, id);
     }
-  }, [branches]);
+  }, [branches, user]);
 
   const value = {
     branches,

@@ -15,9 +15,10 @@ import { TableSkeleton } from '@/components/table-skeleton';
 import { Spinner } from '@/components/spinner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { BranchGuard } from '@/components/branch-guard';
 
 
-function NewItemForm({ onFormSubmit }: { onFormSubmit: () => void }) {
+function NewItemForm({ onFormSubmit, branchId }: { onFormSubmit: () => void, branchId: string }) {
   const { toast } = useToast();
   const [itemName, setItemName] = useState('');
   const [quantity, setQuantity] = useState('');
@@ -38,6 +39,7 @@ function NewItemForm({ onFormSubmit }: { onFormSubmit: () => void }) {
         quantity: parseFloat(quantity),
         unitCost: parseFloat(unitCost),
         unitPrice: unitPrice ? parseFloat(unitPrice) : null,
+        branchId: branchId,
       });
       toast({ title: 'نجاح', description: 'تمت إضافة الصنف إلى المخزون بنجاح!' });
       setItemName('');
@@ -85,7 +87,7 @@ function NewItemForm({ onFormSubmit }: { onFormSubmit: () => void }) {
 
 function EditItemForm({ item, onFormSubmit }: { item: InventoryItem, onFormSubmit: () => void }) {
     const { toast } = useToast();
-    const [formData, setFormData] = useState<NewInventoryItem>({
+    const [formData, setFormData] = useState({
         name: item.name,
         quantity: item.quantity,
         unitCost: item.unitCost,
@@ -235,21 +237,20 @@ function InventoryTable({ items, onDataChange }: { items: InventoryItem[], onDat
   )
 }
 
-
-export default function InventoryPage() {
+function InventoryPageContent({ branchId }: { branchId: string }) {
     const [items, setItems] = useState<InventoryItem[]>([]);
     const [loading, setLoading] = useState(true);
 
     const fetchData = async () => {
         setLoading(true);
-        const fetchedItems = await getInventoryItems();
+        const fetchedItems = await getInventoryItems(branchId);
         setItems(fetchedItems);
         setLoading(false);
     };
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [branchId]);
 
     if (loading) {
         return (
@@ -279,9 +280,17 @@ export default function InventoryPage() {
              <InventoryTable items={items} onDataChange={fetchData} />
           </div>
           <div>
-            <NewItemForm onFormSubmit={fetchData}/>
+            <NewItemForm onFormSubmit={fetchData} branchId={branchId} />
           </div>
         </div>
       </div>
     );
+}
+
+export default function InventoryPage() {
+    return (
+        <BranchGuard>
+            {(branchId) => <InventoryPageContent branchId={branchId} />}
+        </BranchGuard>
+    )
 }

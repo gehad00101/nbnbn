@@ -1,6 +1,7 @@
 
-import { db } from '@/firebase/config';
-import { collection, addDoc, getDocs, query, serverTimestamp, orderBy } from 'firebase/firestore';
+import { db, auth } from '@/firebase/config';
+import { collection, addDoc, getDocs, query, serverTimestamp, orderBy, where } from 'firebase/firestore';
+import { getCurrentUser } from '@/utils/auth';
 
 export interface BankTransaction {
   id: string;
@@ -9,6 +10,7 @@ export interface BankTransaction {
   date: string;
   type: 'deposit' | 'withdrawal';
   createdAt: any;
+  branchId?: string;
 }
 
 export interface NewBankTransaction {
@@ -16,17 +18,17 @@ export interface NewBankTransaction {
   amount: number;
   date: string;
   type: 'deposit' | 'withdrawal';
+  branchId?: string;
 }
 
-const getBankCollectionRef = () => {
-    // We are using a hard-coded user ID because auth has been removed.
-    const userId = 'default-user';
-    return collection(db, 'users', userId, 'bankTransactions');
+const getBankCollectionRef = async () => {
+    const user = await getCurrentUser();
+    return collection(db, 'users', user.uid, 'bankTransactions');
 }
 
 // Function to add a new bank transaction
 export async function addBankTransaction(transactionData: NewBankTransaction) {
-  const bankCollectionRef = getBankCollectionRef();
+  const bankCollectionRef = await getBankCollectionRef();
   
   await addDoc(bankCollectionRef, {
     ...transactionData,
@@ -36,7 +38,7 @@ export async function addBankTransaction(transactionData: NewBankTransaction) {
 
 // Function to get all bank transactions for a user
 export async function getBankTransactions(): Promise<BankTransaction[]> {
-  const bankCollectionRef = getBankCollectionRef();
+  const bankCollectionRef = await getBankCollectionRef();
   const q = query(
     bankCollectionRef, 
     orderBy('date', 'desc'),

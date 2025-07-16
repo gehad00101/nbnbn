@@ -11,6 +11,7 @@ const saleSchema = z.object({
   amount: z.coerce.number().min(0.01, 'المبلغ يجب أن يكون أكبر من صفر'),
   date: z.string().min(1, 'التاريخ مطلوب'),
   status: z.enum(['paid', 'due']),
+  branchId: z.string().min(1, "Branch ID is required"),
 });
 
 export type FormState = {
@@ -25,6 +26,7 @@ export async function addSaleAction(prevState: FormState, formData: FormData): P
     amount: formData.get('amount'),
     date: formData.get('date'),
     status: formData.get('status'),
+    branchId: formData.get('branchId'),
   });
 
   if (!validatedFields.success) {
@@ -39,16 +41,19 @@ export async function addSaleAction(prevState: FormState, formData: FormData): P
     const newSale = await addSale(validatedFields.data);
 
     // Automatically create a bank deposit for the sale
-    await addBankTransaction({
-      amount: validatedFields.data.amount,
-      date: validatedFields.data.date,
-      description: `إيداع مبيعات - فاتورة ${newSale.id.slice(0,6).toUpperCase()}`,
-      type: 'deposit',
-    });
+    if (validatedFields.data.status === 'paid') {
+      await addBankTransaction({
+        amount: validatedFields.data.amount,
+        date: validatedFields.data.date,
+        description: `إيداع مبيعات - فاتورة ${newSale.id.slice(0,6).toUpperCase()}`,
+        type: 'deposit',
+        branchId: validatedFields.data.branchId, // Associate with branch
+      });
+    }
     
     revalidatePath('/sales');
     revalidatePath('/bank'); // Revalidate bank page as well
-    return { message: 'تمت إضافة الفاتورة والإيداع البنكي بنجاح!', success: true };
+    return { message: 'تمت إضافة الفاتورة بنجاح!', success: true };
   } catch (e: any) {
     return { message: `خطأ في إضافة الفاتورة: ${e.message}`, success: false };
   }

@@ -2,7 +2,9 @@
 import type { Metadata } from "next";
 import { Noto_Kufi_Arabic } from "next/font/google";
 import { Toaster } from "@/components/ui/toaster";
+import { AuthProvider } from "@/context/AuthContext";
 import "./globals.css";
+import { BranchProvider } from "@/context/BranchContext";
 
 const notoKufiArabic = Noto_Kufi_Arabic({
   subsets: ["arabic"],
@@ -12,7 +14,7 @@ const notoKufiArabic = Noto_Kufi_Arabic({
 
 export const metadata: Metadata = {
   title: "Buna | نظام محاسبي للمقهى",
-  description: "نظام محاسبي مدعوم بالذكاء الاصطناعي لمقهاك.",
+  description: "نظام محاسبي مدعوم بالذكاء الإسناعي لمقهاك.",
 };
 
 export default function RootLayout({
@@ -23,7 +25,11 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl">
       <body className={`${notoKufiArabic.variable} font-body antialiased bg-background`}>
-        {children}
+        <AuthProvider>
+          <BranchProvider>
+            {children}
+          </BranchProvider>
+        </AuthProvider>
         <Toaster />
       </body>
     </html>

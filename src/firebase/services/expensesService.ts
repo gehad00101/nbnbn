@@ -1,6 +1,7 @@
 
-import { db } from '@/firebase/config';
-import { collection, addDoc, getDocs, query, serverTimestamp, orderBy } from 'firebase/firestore';
+import { db, auth } from '@/firebase/config';
+import { collection, addDoc, getDocs, query, serverTimestamp, orderBy, where } from 'firebase/firestore';
+import { getCurrentUser } from '@/utils/auth';
 
 export interface Expense {
   id: string;
@@ -8,6 +9,7 @@ export interface Expense {
   category: string;
   amount: number;
   date: string;
+  branchId: string;
 }
 
 export interface NewExpense {
@@ -15,17 +17,17 @@ export interface NewExpense {
   category: string;
   amount: number;
   date: string;
+  branchId: string;
 }
 
-const getExpensesCollectionRef = () => {
-    // We are using a hard-coded user ID because auth has been removed.
-    const userId = 'default-user';
-    return collection(db, 'users', userId, 'expenses');
+const getExpensesCollectionRef = async () => {
+    const user = await getCurrentUser();
+    return collection(db, 'users', user.uid, 'expenses');
 }
 
 // Function to add a new expense
 export async function addExpense(expenseData: NewExpense) {
-  const expensesCollectionRef = getExpensesCollectionRef();
+  const expensesCollectionRef = await getExpensesCollectionRef();
   
   await addDoc(expensesCollectionRef, {
     ...expenseData,
@@ -33,11 +35,12 @@ export async function addExpense(expenseData: NewExpense) {
   });
 }
 
-// Function to get all expenses for a user
-export async function getExpenses(): Promise<Expense[]> {
-  const expensesCollectionRef = getExpensesCollectionRef();
+// Function to get all expenses for a user's branch
+export async function getExpenses(branchId: string): Promise<Expense[]> {
+  const expensesCollectionRef = await getExpensesCollectionRef();
   const q = query(
     expensesCollectionRef, 
+    where('branchId', '==', branchId),
     orderBy('createdAt', 'desc')
   );
 

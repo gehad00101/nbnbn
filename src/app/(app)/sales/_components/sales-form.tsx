@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useEffect, useRef } from 'react';
 import { SubmitButton } from '@/components/submit-button';
 import { addSaleAction, type FormState } from '../actions';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 const saleSchema = z.object({
   customerName: z.string().min(1, 'اسم العميل مطلوب'),
@@ -24,7 +25,7 @@ const saleSchema = z.object({
 
 type SaleFormValues = z.infer<typeof saleSchema>;
 
-export function SalesForm() {
+export function SalesForm({ branchId }: { branchId: string }) {
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -63,6 +64,7 @@ export function SalesForm() {
           className="space-y-4"
         >
           <CardContent className='space-y-4'>
+            <input type="hidden" name="branchId" value={branchId} />
             <FormField
               control={form.control}
               name="customerName"
@@ -102,8 +104,40 @@ export function SalesForm() {
                 </FormItem>
               )}
             />
-            {/* We will add status selection later */}
-             <input type="hidden" name="status" value="paid" />
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem className="space-y-3">
+                  <FormLabel>حالة الفاتورة</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex flex-row space-x-4 space-x-reverse"
+                    >
+                      <FormItem className="flex items-center space-x-2 space-x-reverse">
+                        <FormControl>
+                          <RadioGroupItem value="paid" id="paid" />
+                        </FormControl>
+                        <FormLabel htmlFor="paid" className="font-normal">
+                          مدفوعة
+                        </FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-2 space-x-reverse">
+                        <FormControl>
+                          <RadioGroupItem value="due" id="due" />
+                        </FormControl>
+                        <FormLabel htmlFor="due" className="font-normal">
+                          مستحقة
+                        </FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </CardContent>
           <CardFooter>
             <SubmitButton>

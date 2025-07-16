@@ -10,6 +10,7 @@ const expenseSchema = z.object({
   amount: z.coerce.number().min(0.01, 'المبلغ يجب أن يكون أكبر من صفر'),
   date: z.string().min(1, 'التاريخ مطلوب'),
   category: z.string().min(1, 'الفئة مطلوبة'),
+  branchId: z.string().min(1, "Branch ID is required"),
 });
 
 export type FormState = {
@@ -24,6 +25,7 @@ export async function addExpenseAction(prevState: FormState, formData: FormData)
     amount: formData.get('amount'),
     date: formData.get('date'),
     category: formData.get('category'),
+    branchId: formData.get('branchId'),
   });
 
   if (!validatedFields.success) {

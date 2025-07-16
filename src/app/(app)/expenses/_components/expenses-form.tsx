@@ -25,7 +25,7 @@ const expenseSchema = z.object({
 
 type ExpenseFormValues = z.infer<typeof expenseSchema>;
 
-export function ExpensesForm() {
+export function ExpensesForm({ branchId }: { branchId: string }) {
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -64,6 +64,7 @@ export function ExpensesForm() {
           className="space-y-4"
         >
           <CardContent className="space-y-4">
+            <input type="hidden" name="branchId" value={branchId} />
              <FormField
               control={form.control}
               name="description"
