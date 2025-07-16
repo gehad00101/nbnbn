@@ -1,23 +1,25 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 type StatCardProps = {
   title: string;
   value: string;
-  change: string;
+  change?: string;
   icon: ReactNode;
+  className?: string;
 };
 
-export function StatCard({ title, value, change, icon }: StatCardProps) {
+export function StatCard({ title, value, change, icon, className }: StatCardProps) {
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+    <Card className={cn("bg-white p-6 rounded-xl shadow-md", className)}>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-0">
+        <CardTitle className="text-lg font-semibold text-gray-700">{title}</CardTitle>
         {icon}
       </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
-        <p className="text-xs text-muted-foreground">{change}</p>
+      <CardContent className="p-0 mt-4">
+        <div className="text-3xl font-bold text-gray-900">{value}</div>
+        {change && <p className="text-xs text-muted-foreground">{change}</p>}
       </CardContent>
     </Card>
   );

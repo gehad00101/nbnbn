@@ -19,7 +19,7 @@ const data = [
 const chartConfig = {
   sales: {
     label: "المبيعات",
-    color: "hsl(var(--primary))",
+    color: "hsl(var(--chart-1))",
   },
 } satisfies ChartConfig
 
@@ -41,8 +41,12 @@ export function SalesChart() {
             tickLine={false}
             axisLine={false}
             tickFormatter={(value) => `${value / 1000} ألف`}
+            orientation="right"
           />
-          <Tooltip content={<ChartTooltipContent />} />
+          <Tooltip 
+            cursor={{fill: 'hsl(var(--muted))'}}
+            content={<ChartTooltipContent />} 
+          />
           <Bar dataKey="sales" fill="var(--color-sales)" radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>

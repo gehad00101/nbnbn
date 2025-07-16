@@ -14,9 +14,13 @@ import {
   ReceiptText,
   Warehouse,
   BarChart4,
-  Coffee,
+  Users,
+  Building,
+  Landmark,
+  UserCircle,
   ChevronDown,
-  Mic,
+  Settings,
+  LogOut,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -24,18 +28,21 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
 import { Logo } from "@/components/logo";
+import { Header } from "@/components/header";
+
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <Sidebar>
+      <Sidebar side="right">
         <SidebarHeader>
           <div className="flex items-center gap-2">
             <Logo />
             <h1 className="text-xl font-bold text-sidebar-foreground">
-              بُنّا
+              المحاسب الذكي
             </h1>
           </div>
         </SidebarHeader>
@@ -44,13 +51,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <SidebarMenuItem>
               <SidebarMenuButton href="/" isActive>
                 <LayoutDashboard />
-                لوحة التحكم
+                الرئيسية
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton href="/invoices">
+              <SidebarMenuButton href="/sales">
                 <ReceiptText />
-                الفواتير
+                المبيعات
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton href="/expenses">
+                <ReceiptText />
+                المصروفات
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
@@ -60,15 +73,27 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
+              <SidebarMenuButton href="/employees">
+                <Users />
+                الموظفين
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
               <SidebarMenuButton href="/reports">
                 <BarChart4 />
                 التقارير
               </SidebarMenuButton>
             </SidebarMenuItem>
-             <SidebarMenuItem>
-              <SidebarMenuButton href="/voice-assistant">
-                <Mic />
-                المساعد الصوتي
+            <SidebarMenuItem>
+              <SidebarMenuButton href="/bank">
+                <Landmark />
+                البنك
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton href="/branches">
+                <Building />
+                الفروع
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -93,14 +118,27 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
-              <DropdownMenuItem>الملف الشخصي</DropdownMenuItem>
-              <DropdownMenuItem>الإعدادات</DropdownMenuItem>
-              <DropdownMenuItem>تسجيل الخروج</DropdownMenuItem>
+               <DropdownMenuItem>
+                <UserCircle className="mr-2 h-4 w-4" />
+                <span>الملف الشخصي</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Settings className="mr-2 h-4 w-4" />
+                <span>الإعدادات</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>تسجيل الخروج</span>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </SidebarFooter>
       </Sidebar>
-      <SidebarInset>{children}</SidebarInset>
+      <SidebarInset>
+        <Header />
+        {children}
+      </SidebarInset>
     </SidebarProvider>
   );
 }

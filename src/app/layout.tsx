@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
-import { PT_Sans } from "next/font/google";
+import { Noto_Kufi_Arabic } from "next/font/google";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
-const ptSans = PT_Sans({
-  subsets: ["latin"],
+const notoKufiArabic = Noto_Kufi_Arabic({
+  subsets: ["arabic"],
   weight: ["400", "700"],
   variable: "--font-body",
 });
 
 export const metadata: Metadata = {
-  title: "Buna | AI Accounting",
-  description: "AI-powered accounting for your coffee shop.",
+  title: "Buna | نظام محاسبي للمقهى",
+  description: "نظام محاسبي مدعوم بالذكاء الاصطناعي لمقهاك.",
 };
 
 export default function RootLayout({
@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl">
-      <body className={`${ptSans.variable} font-body antialiased`}>
+      <body className={`${notoKufiArabic.variable} font-body antialiased`}>
         {children}
         <Toaster />
       </body>
