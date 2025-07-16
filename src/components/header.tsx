@@ -10,9 +10,27 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
+import { auth } from "@/firebase/config";
+import { signOut } from "firebase/auth";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 export function Header() {
+  const { user } = useAuth();
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      toast({ title: "تم تسجيل الخروج بنجاح." });
+      router.push('/login');
+    } catch (error) {
+      toast({ title: "حدث خطأ أثناء تسجيل الخروج.", variant: "destructive" });
+    }
+  };
+
   return (
     <header className="sticky top-0 z-10 flex h-[57px] items-center gap-1 border-b bg-background px-4">
       <div className="md:hidden">
@@ -33,9 +51,11 @@ export function Header() {
               </SelectContent>
             </Select>
         </div>
-        <Button variant="outline" asChild>
-          <Link href="/login">تسجيل الخروج</Link>
-        </Button>
+        {user && (
+          <Button variant="outline" onClick={handleLogout}>
+            تسجيل الخروج
+          </Button>
+        )}
       </div>
     </header>
   );
