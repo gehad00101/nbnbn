@@ -1,3 +1,4 @@
+
 "use client"
 
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts"
@@ -7,15 +8,6 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart"
 
-const data = [
-  { month: "يناير", sales: 18600 },
-  { month: "فبراير", sales: 30500 },
-  { month: "مارس", sales: 23700 },
-  { month: "أبريل", sales: 7300 },
-  { month: "مايو", sales: 20900 },
-  { month: "يونيو", sales: 21400 },
-]
-
 const chartConfig = {
   sales: {
     label: "المبيعات",
@@ -23,7 +15,19 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function SalesChart() {
+type SalesChartProps = {
+  data: { month: string; sales: number }[];
+}
+
+export function SalesChart({ data }: SalesChartProps) {
+  if (data.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-[350px] text-muted-foreground">
+        لا توجد بيانات مبيعات لعرضها.
+      </div>
+    )
+  }
+  
   return (
     <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
       <ResponsiveContainer width="100%" height={350}>
@@ -53,3 +57,5 @@ export function SalesChart() {
     </ChartContainer>
   )
 }
+
+    

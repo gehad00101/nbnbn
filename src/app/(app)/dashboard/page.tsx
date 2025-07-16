@@ -5,8 +5,31 @@ import { PageHeader } from "@/components/page-header"
 import { StatCard } from "@/components/stat-card"
 import { SalesChart } from "@/components/sales-chart"
 import { RecentSales } from "@/components/recent-sales"
+import { getSales } from "@/firebase/services/salesService";
+import { getExpenses } from "@/firebase/services/expensesService";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const sales = await getSales();
+  const expenses = await getExpenses();
+
+  const totalRevenue = sales.reduce((acc, sale) => acc + sale.amount, 0);
+  const totalExpenses = expenses.reduce((acc, expense) => acc + expense.amount, 0);
+  const netProfit = totalRevenue - totalExpenses;
+
+   const salesByMonth = sales.reduce((acc, sale) => {
+    const month = new Date(sale.date).toLocaleString('ar-EG', { month: 'long' });
+    if (!acc[month]) {
+      acc[month] = 0;
+    }
+    acc[month] += sale.amount;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const chartData = Object.entries(salesByMonth).map(([month, sales]) => ({
+    month,
+    sales,
+  }));
+
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6">
       <PageHeader title="لوحة التحكم" />
@@ -14,24 +37,21 @@ export default function DashboardPage() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <StatCard 
           title="إجمالي المبيعات"
-          value="12,345.67 ريال"
+          value={`${totalRevenue.toFixed(2)} ريال`}
           icon={<DollarSign className="h-6 w-6 text-blue-500" />}
           className="border-t-4 border-blue-500"
-          change="+12.5% من الشهر الماضي"
         />
         <StatCard 
           title="إجمالي المصروفات"
-          value="4,567.89 ريال"
+          value={`${totalExpenses.toFixed(2)} ريال`}
           icon={<ArrowDown className="h-6 w-6 text-red-500" />}
           className="border-t-4 border-red-500"
-          change="+8.2% من الشهر الماضي"
         />
         <StatCard 
           title="صافي الربح"
-          value="7,777.78 ريال"
+          value={`${netProfit.toFixed(2)} ريال`}
           icon={<Scale className="h-6 w-6 text-green-500" />}
            className="border-t-4 border-green-500"
-           change="+15.3% من الشهر الماضي"
         />
       </div>
 
@@ -41,7 +61,7 @@ export default function DashboardPage() {
             <CardTitle>نظرة عامة على المبيعات</CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
-            <SalesChart />
+            <SalesChart data={chartData} />
           </CardContent>
         </Card>
         <Card className="lg:col-span-3">
@@ -57,3 +77,4 @@ export default function DashboardPage() {
   )
 }
 
+    
