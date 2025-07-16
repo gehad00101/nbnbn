@@ -26,7 +26,7 @@ import {
   LogOut,
   UserCog,
   FileText,
-  Sitemap,
+  Network,
   BookText
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -95,7 +95,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </SidebarMenuItem>
              <SidebarMenuItem>
               <SidebarMenuButton href="/chart-of-accounts">
-                <Sitemap />
+                <Network />
                 شجرة الحسابات
               </SidebarMenuButton>
             </SidebarMenuItem>
