@@ -3,9 +3,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup, User } from 'firebase/auth';
 import { auth, db } from '@/firebase/config';
-import { setDoc, doc } from 'firebase/firestore';
+import { setDoc, doc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -19,6 +19,23 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { Spinner } from '@/components/spinner';
+
+async function setupNewUser(user: User, displayName?: string | null) {
+  // Create user document
+  await setDoc(doc(db, "users", user.uid), {
+    uid: user.uid,
+    displayName: displayName || user.displayName,
+    email: user.email,
+    role: "owner"
+  }, { merge: true });
+
+  // Create a default main branch for the new user
+  const branchesCollectionRef = collection(db, 'users', user.uid, 'branches');
+  await addDoc(branchesCollectionRef, {
+    name: 'الفرع الرئيسي',
+    createdAt: serverTimestamp(),
+  });
+}
 
 export default function RegisterPage() {
   const [firstName, setFirstName] = useState('');
@@ -35,17 +52,10 @@ export default function RegisterPage() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
+      const displayName = `${firstName} ${lastName}`;
       
-      await updateProfile(user, {
-        displayName: `${firstName} ${lastName}`,
-      });
-
-      await setDoc(doc(db, "users", user.uid), {
-        uid: user.uid,
-        displayName: `${firstName} ${lastName}`,
-        email: user.email,
-        role: "owner"
-      });
+      await updateProfile(user, { displayName });
+      await setupNewUser(user, displayName);
       
       toast({ title: "تم إنشاء الحساب بنجاح!" });
       router.push('/dashboard');
@@ -73,12 +83,7 @@ export default function RegisterPage() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-       await setDoc(doc(db, "users", user.uid), {
-        uid: user.uid,
-        displayName: user.displayName,
-        email: user.email,
-        role: "owner"
-      }, { merge: true });
+      await setupNewUser(user);
 
       toast({ title: "تم تسجيل الدخول بنجاح باستخدام Google!" });
       router.push('/dashboard');
