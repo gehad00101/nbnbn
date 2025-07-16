@@ -26,6 +26,8 @@ import {
   LogOut,
   UserCog,
   FileText,
+  Sitemap,
+  BookText
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -79,10 +81,22 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 المصروفات
               </SidebarMenuButton>
             </SidebarMenuItem>
+             <SidebarMenuItem>
+              <SidebarMenuButton href="/journal-entries">
+                <BookText />
+                القيود اليومية
+              </SidebarMenuButton>
+            </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton href="/inventory">
                 <Warehouse />
                 المخزون
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+             <SidebarMenuItem>
+              <SidebarMenuButton href="/chart-of-accounts">
+                <Sitemap />
+                شجرة الحسابات
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
