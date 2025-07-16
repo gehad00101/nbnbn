@@ -53,6 +53,7 @@ export async function addSaleAction(prevState: FormState, formData: FormData): P
     
     revalidatePath('/sales');
     revalidatePath('/bank'); // Revalidate bank page as well
+    revalidatePath('/dashboard'); // Revalidate dashboard page
     return { message: 'تمت إضافة الفاتورة بنجاح!', success: true };
   } catch (e: any) {
     return { message: `خطأ في إضافة الفاتورة: ${e.message}`, success: false };

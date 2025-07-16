@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,10 +13,11 @@ import { useToast } from '@/hooks/use-toast';
 import { addBankTransaction, getBankTransactions, BankTransaction } from '@/firebase/services/bankService';
 import { TableSkeleton } from '@/components/table-skeleton';
 import { Spinner } from '@/components/spinner';
+import { BranchGuard } from '@/components/branch-guard';
 import { useRouter } from 'next/navigation';
 
-async function BankTable() {
-  const transactions = await getBankTransactions();
+
+function BankTable({ transactions }: { transactions: BankTransaction[] }) {
   const balance = transactions.reduce((acc, t) => {
     return t.type === 'deposit' ? acc + t.amount : acc - t.amount;
   }, 0);
@@ -75,13 +76,12 @@ async function BankTable() {
 }
 
 
-function NewTransactionForm() {
+function NewTransactionForm({ branchId, onTransactionAdded }: { branchId: string, onTransactionAdded: () => void }) {
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
-  const router = useRouter();
 
   const handleTransaction = async (type: 'deposit' | 'withdrawal') => {
     if (!amount || !date || !description) {
@@ -96,15 +96,13 @@ function NewTransactionForm() {
         date,
         description,
         type,
+        branchId
       });
       toast({ title: 'نجاح', description: `تمت عملية ال${type === 'deposit' ? 'إيداع' : 'سحب'} بنجاح!` });
       setAmount('');
       setDate(new Date().toISOString().split('T')[0]);
       setDescription('');
-      
-      // Manually trigger a re-render/re-fetch on the server
-      router.refresh();
-
+      onTransactionAdded();
     } catch (error: any) {
       toast({ title: 'خطأ', description: error.message, variant: 'destructive' });
     } finally {
@@ -145,21 +143,70 @@ function NewTransactionForm() {
   )
 }
 
-export default function BankPage() {
+
+function BankPageContent({ branchId }: { branchId: string }) {
+  const [transactions, setTransactions] = useState<BankTransaction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  const fetchTransactions = async () => {
+    setLoading(true);
+    const data = await getBankTransactions(branchId);
+    setTransactions(data);
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [branchId]);
+
+  const handleTransactionAdded = () => {
+    fetchTransactions();
+    // Also refresh other pages that might use this data like dashboard
+    router.refresh();
+  };
+
+
+  if (loading) {
+     return (
+        <div className="flex flex-col gap-6 p-4 md:p-6">
+            <PageHeader title="البنك والكاش" />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
+                    <TableSkeleton headers={['التاريخ', 'الوصف', 'نوع المعاملة', 'المبلغ']} />
+                </div>
+                <div>
+                    <Card>
+                      <CardHeader><CardTitle>معاملة جديدة</CardTitle></CardHeader>
+                      <CardContent><Spinner /></CardContent>
+                    </Card>
+                </div>
+            </div>
+        </div>
+    )
+  }
+
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6">
       <PageHeader title="البنك والكاش" />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <Suspense fallback={<TableSkeleton headers={['التاريخ', 'الوصف', 'نوع المعاملة', 'المبلغ']} />}>
-            <BankTable />
-          </Suspense>
+          <BankTable transactions={transactions} />
         </div>
         <div>
-          <NewTransactionForm />
+          <NewTransactionForm branchId={branchId} onTransactionAdded={handleTransactionAdded} />
         </div>
       </div>
     </div>
   );
+}
+
+
+export default function BankPage() {
+  return (
+    <BranchGuard>
+      {(branchId) => <BankPageContent branchId={branchId} />}
+    </BranchGuard>
+  )
 }

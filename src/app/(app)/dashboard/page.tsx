@@ -109,7 +109,7 @@ function DashboardContent({ branchId }: { branchId: string }) {
           </CardHeader>
           <CardContent>
             <Suspense fallback={<Spinner />}>
-              <RecentSales />
+              <RecentSales branchId={branchId} />
             </Suspense>
           </CardContent>
         </Card>

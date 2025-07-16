@@ -1,11 +1,33 @@
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowDown, ArrowUp } from "lucide-react";
-import { getBankTransactions } from "@/firebase/services/bankService";
-import { Badge } from "./ui/badge";
+'use client'
 
-export async function RecentSales() {
-  const transactions = (await getBankTransactions()).slice(0, 5);
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ArrowDown, ArrowUp } from "lucide-react";
+import { getBankTransactions, type BankTransaction } from "@/firebase/services/bankService";
+import { Badge } from "./ui/badge";
+import { useEffect, useState } from "react";
+import { Spinner } from "./spinner";
+
+export function RecentSales({ branchId }: { branchId: string }) {
+  const [transactions, setTransactions] = useState<BankTransaction[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchTransactions() {
+      setLoading(true);
+      const fetchedTransactions = await getBankTransactions(branchId);
+      setTransactions(fetchedTransactions.slice(0, 5));
+      setLoading(false);
+    }
+    
+    if (branchId) {
+      fetchTransactions();
+    }
+  }, [branchId]);
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-full"><Spinner /></div>;
+  }
 
   return (
     <div className="space-y-4">
@@ -32,5 +54,3 @@ export async function RecentSales() {
     </div>
   );
 }
-
-    
