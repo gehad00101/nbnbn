@@ -1,3 +1,4 @@
+
 import {
   SidebarProvider,
   Sidebar,
@@ -22,6 +23,7 @@ import {
   Settings,
   LogOut,
   UserCog,
+  FileText,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -33,6 +35,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Logo } from "@/components/logo";
 import { Header } from "@/components/header";
+import Link from "next/link";
 
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -40,12 +43,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       <Sidebar side="right">
         <SidebarHeader>
-          <div className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <Logo />
             <h1 className="text-xl font-bold text-sidebar-foreground">
               المحاسب الذكي
             </h1>
-          </div>
+          </Link>
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
@@ -57,6 +60,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton href="/sales">
+                <FileText />
+                الفواتير
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+             <SidebarMenuItem>
+              <SidebarMenuButton href="/invoices">
                 <ReceiptText />
                 المبيعات
               </SidebarMenuButton>
@@ -136,7 +145,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <LogOut className="mr-2 h-4 w-4" />
-                <span>تسجيل الخروج</span>
+                <Link href="/login">تسجيل الخروج</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

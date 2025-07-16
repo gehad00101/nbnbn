@@ -1,3 +1,4 @@
+
 "use client";
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -9,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export function Header() {
   return (
@@ -18,9 +20,9 @@ export function Header() {
       </div>
       <h1 className="text-xl font-semibold hidden md:block">نظام محاسبي للمقهى</h1>
       <div className="flex items-center gap-4 ml-auto">
-         <div className="flex items-center gap-2 text-sm text-gray-600">
-            <label htmlFor="branchSelector" className="font-semibold">الفرع المحدد:</label>
-            <Select defaultValue="main_branch">
+         <div className="flex items-center gap-2 text-sm">
+            <label htmlFor="branchSelector" className="font-medium text-muted-foreground">الفرع المحدد:</label>
+            <Select dir="rtl" defaultValue="main_branch">
               <SelectTrigger id="branchSelector" className="w-[180px]">
                 <SelectValue placeholder="اختر الفرع" />
               </SelectTrigger>
@@ -31,7 +33,9 @@ export function Header() {
               </SelectContent>
             </Select>
         </div>
-        <Button variant="outline">تسجيل الخروج</Button>
+        <Button variant="outline" asChild>
+          <Link href="/login">تسجيل الخروج</Link>
+        </Button>
       </div>
     </header>
   );

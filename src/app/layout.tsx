@@ -1,3 +1,4 @@
+
 import type { Metadata } from "next";
 import { Noto_Kufi_Arabic } from "next/font/google";
 import { Toaster } from "@/components/ui/toaster";
@@ -21,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl">
-      <body className={`${notoKufiArabic.variable} font-body antialiased`}>
+      <body className={`${notoKufiArabic.variable} font-body antialiased bg-background`}>
         {children}
         <Toaster />
       </body>

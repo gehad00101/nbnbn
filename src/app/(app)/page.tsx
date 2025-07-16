@@ -1,5 +1,6 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { DollarSign, ArrowUp, ArrowDown, Scale } from "lucide-react"
+import { DollarSign, ArrowDown, Scale } from "lucide-react"
 import { PageHeader } from "@/components/page-header"
 import { StatCard } from "@/components/stat-card"
 import { SalesChart } from "@/components/sales-chart"
@@ -13,21 +14,24 @@ export default function DashboardPage() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <StatCard 
           title="إجمالي المبيعات"
-          value="0.00 ريال"
+          value="12,345.67 ريال"
           icon={<DollarSign className="h-6 w-6 text-blue-500" />}
           className="border-t-4 border-blue-500"
+          change="+12.5% من الشهر الماضي"
         />
         <StatCard 
           title="إجمالي المصروفات"
-          value="0.00 ريال"
+          value="4,567.89 ريال"
           icon={<ArrowDown className="h-6 w-6 text-red-500" />}
           className="border-t-4 border-red-500"
+          change="+8.2% من الشهر الماضي"
         />
         <StatCard 
           title="صافي الربح"
-          value="0.00 ريال"
+          value="7,777.78 ريال"
           icon={<Scale className="h-6 w-6 text-green-500" />}
            className="border-t-4 border-green-500"
+           change="+15.3% من الشهر الماضي"
         />
       </div>
 
