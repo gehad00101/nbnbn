@@ -34,9 +34,16 @@ export default function LoginPage() {
       toast({ title: "تم تسجيل الدخول بنجاح!" });
       router.push('/dashboard');
     } catch (error: any) {
+      const errorCode = error.code;
+      let message = "حدث خطأ غير متوقع.";
+      if (errorCode === 'auth/user-not-found' || errorCode === 'auth/wrong-password' || errorCode === 'auth/invalid-credential') {
+        message = 'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
+      } else if (errorCode === 'auth/invalid-email') {
+        message = 'صيغة البريد الإلكتروني غير صحيحة.';
+      }
       toast({
         title: "خطأ في تسجيل الدخول",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     } finally {
@@ -54,7 +61,7 @@ export default function LoginPage() {
     } catch (error: any) {
       toast({
         title: "خطأ في تسجيل الدخول عبر Google",
-        description: error.message,
+        description: "لم نتمكن من إكمال تسجيل الدخول باستخدام جوجل. يرجى المحاولة مرة أخرى.",
         variant: "destructive",
       });
     } finally {
@@ -90,7 +97,7 @@ export default function LoginPage() {
               <div className="grid gap-2">
                 <div className="flex items-center">
                   <Label htmlFor="password">كلمة المرور</Label>
-                  <Link href="#" className="ml-auto inline-block text-sm underline">
+                  <Link href="#" className="mr-auto inline-block text-sm underline">
                     نسيت كلمة المرور؟
                   </Link>
                 </div>

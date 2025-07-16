@@ -36,25 +36,29 @@ export default function RegisterPage() {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       
-      // Update profile
       await updateProfile(user, {
         displayName: `${firstName} ${lastName}`,
       });
 
-      // Create user document in Firestore
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
         displayName: `${firstName} ${lastName}`,
         email: user.email,
-        role: "owner" // First user is owner, logic can be adjusted
+        role: "owner"
       });
       
       toast({ title: "تم إنشاء الحساب بنجاح!" });
       router.push('/dashboard');
     } catch (error: any) {
+      let message = "حدث خطأ غير متوقع.";
+      if (error.code === 'auth/email-already-in-use') {
+        message = "هذا البريد الإلكتروني مستخدم بالفعل.";
+      } else if (error.code === 'auth/weak-password') {
+        message = "كلمة المرور ضعيفة جدًا. يجب أن تكون 6 أحرف على الأقل."
+      }
       toast({
         title: "خطأ في إنشاء الحساب",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     } finally {
@@ -69,7 +73,6 @@ export default function RegisterPage() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // Create user document in Firestore if it doesn't exist
        await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
         displayName: user.displayName,
@@ -82,7 +85,7 @@ export default function RegisterPage() {
     } catch (error: any) {
        toast({
         title: "خطأ في تسجيل الدخول عبر Google",
-        description: error.message,
+        description: "لم نتمكن من إكمال تسجيل الدخول باستخدام جوجل. يرجى المحاولة مرة أخرى.",
         variant: "destructive",
       });
     } finally {
